@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Entities;
 using RepositoryContracts;
 
@@ -30,10 +31,10 @@ public class UserFileRepository : IUserRepository
     public void Update(User user)
     {
         var list = FileHelper.LoadList<User>(_filePath);
-        var ex = list.FirstOrDefault(u => u.Id == user.Id);
-        if (ex != null)
+        var existing = list.FirstOrDefault(u => u.Id == user.Id);
+        if (existing != null)
         {
-            list.Remove(ex);
+            list.Remove(existing);
             list.Add(user);
             FileHelper.SaveList(_filePath, list);
         }
@@ -55,5 +56,26 @@ public class UserFileRepository : IUserRepository
     public List<User> GetAll()
     {
         return FileHelper.LoadList<User>(_filePath);
+    }
+
+    public async Task<User?> GetUserByUsernameAsync(string username)
+    {
+        var user = GetByUsername(username);
+        return await Task.FromResult(user);
+    }
+
+    // Additional useful methods
+    public User? GetByUsername(string username)
+    {
+        var list = FileHelper.LoadList<User>(_filePath);
+        return list.FirstOrDefault(u => 
+            u.Username?.Equals(username, StringComparison.OrdinalIgnoreCase) == true);
+    }
+
+    public bool UsernameExists(string username)
+    {
+        var list = FileHelper.LoadList<User>(_filePath);
+        return list.Any(u => 
+            u.Username?.Equals(username, StringComparison.OrdinalIgnoreCase) == true);
     }
 }

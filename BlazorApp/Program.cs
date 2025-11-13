@@ -1,12 +1,15 @@
 using BlazorApp.Components;
 using BlazorApp.Components.Services;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.Authorization;  // Add this
+using BlazorApp.Auth;  // Add this - adjust namespace if different
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddAuthorization();
 
 // Register HttpClient with named client
 builder.Services.AddHttpClient("ForumApi", client =>
@@ -18,6 +21,7 @@ builder.Services.AddHttpClient("ForumApi", client =>
 builder.Services.AddScoped<IPostService, HttpPostService>();
 builder.Services.AddScoped<IUserService, HttpUserService>();
 builder.Services.AddScoped<ICommentService, HttpCommentService>();
+builder.Services.AddScoped<AuthenticationStateProvider, SimpleAuthProvider>();
 
 var app = builder.Build();
 

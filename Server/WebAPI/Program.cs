@@ -1,34 +1,26 @@
+using RepositoryContracts;
+using FileRepositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddControllers();
-builder.Services.AddOpenApi(); // .NET 9 way for Swagger
 
-// Add CORS to allow Blazor app to connect
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()    // Allow any origin during development
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
+// Register your repositories - ADD THESE LINES:
+builder.Services.AddScoped<IUserRepository, UserFileRepository>();
+builder.Services.AddScoped<IPostRepository, PostFileRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentFileRepository>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi(); // .NET 9 way for Swagger
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();
-app.UseCors("AllowAll"); // Use the new policy
 app.UseAuthorization();
 app.MapControllers();
-
-// Test endpoint - add this before app.Run()
-app.MapGet("/test", () => "API is working!");
 
 app.Run();
